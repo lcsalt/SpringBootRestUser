@@ -2,6 +2,7 @@ package com.appsdeveloperblog.app.ws.service.impl;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.appsdeveloperblog.app.ws.UserRepository;
@@ -17,6 +18,8 @@ public class UserServiceImpl implements UserService {
 	UserRepository userRepository;
 	@Autowired
 	Utils utils;
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
 	public UserDto createUser(UserDto user) {
@@ -34,8 +37,8 @@ public class UserServiceImpl implements UserService {
 		}
 		userEntity.setUserId(generatedId);
 		
-		//Hardcode para probar el servicio y que funcione la encrypted pass que estan not null
-		userEntity.setEncryptedPassword("test");
+		//Encripto la contraseña con el bcryptpasswordencoder.encode
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
 		
 		//Utilizo UserRepository para crear el user y lo asigno a otra entity para pasarla despues al dto y al response
