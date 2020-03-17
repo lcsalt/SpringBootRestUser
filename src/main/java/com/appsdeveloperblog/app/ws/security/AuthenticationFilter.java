@@ -20,9 +20,10 @@ import com.appsdeveloperblog.app.ws.SpringApplicationContext;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.ui.model.request.UserLoginRequestModel;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		public final AuthenticationManager authenticationManager;
@@ -58,19 +59,19 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 											  Authentication auth) throws IOException, ServletException{
 			
 			//Token jjwt 
-			//String userName = ((User) auth.getPrincipal().getUsername());
-			//String token = Jwts.builder()
-			//			   .setSubject(userName)
-			//			   .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EPIRATION_TIME))
-			//			   .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
-			//			   .compact();
+			String userName = (((User) auth.getPrincipal()).getUsername());
+			String token = Jwts.builder()
+						   .setSubject(userName)
+						   .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EPIRATION_TIME))
+						   .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
+						   .compact();
 			
 			//Token JWT 0Auth -> https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
-			String userName = (((User) auth.getPrincipal()).getUsername());
-			String token = JWT.create()
-					 		.withSubject(userName)
-					 		.withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EPIRATION_TIME))
-					 		.sign(Algorithm.HMAC512(SecurityConstants.TOKEN_SECRET.getBytes()));
+			//String userName = (((User) auth.getPrincipal()).getUsername());
+			//String token = JWT.create()
+			//		 		.withSubject(userName)
+			//		 		.withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EPIRATION_TIME))
+			//		 		.sign(Algorithm.HMAC512(SecurityConstants.TOKEN_SECRET.getBytes()));
 			
 			UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
 			UserDto userDto = userService.getUser(userName);
