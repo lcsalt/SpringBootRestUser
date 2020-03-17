@@ -63,7 +63,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 			String token = Jwts.builder()
 						   .setSubject(userName)
 						   .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EPIRATION_TIME))
-						   .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
+						   .signWith(SignatureAlgorithm.HS512, SecurityConstants.getTokenSecret())
 						   .compact();
 			
 			//Token JWT 0Auth -> https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/

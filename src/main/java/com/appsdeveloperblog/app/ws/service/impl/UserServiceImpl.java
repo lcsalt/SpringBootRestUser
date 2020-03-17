@@ -68,6 +68,19 @@ public class UserServiceImpl implements UserService {
 		//devuelvo el dto
 		return returnValue;
 	}
+	
+	@Override
+	public UserDto getUserById(String userId) {
+		UserEntity userEntity = userRepository.findUserByUserId(userId);
+		//si no existe el userid, devuelvo exception
+		if(userEntity == null) throw new UsernameNotFoundException(userId);
+		//copio el userEntity encontrado a un dto
+		UserDto returnValue = new UserDto();
+		BeanUtils.copyProperties(userEntity, returnValue);
+		
+		//devuelvo el dto
+		return returnValue;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -78,5 +91,7 @@ public class UserServiceImpl implements UserService {
 		
 		return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
+
+	
 
 }
