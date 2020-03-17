@@ -1,7 +1,7 @@
 package com.appsdeveloperblog.app.ws.ui.model.request;
 
 public class UserLoginRequestModel {
-	
+	//Estos campos deben coincidir en nombre con los enviados en json por http
 	private String email;
 	private String password;
 	

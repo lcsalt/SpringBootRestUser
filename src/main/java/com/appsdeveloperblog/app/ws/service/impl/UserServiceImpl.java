@@ -10,13 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.appsdeveloperblog.app.ws.UserRepository;
 import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
+import com.appsdeveloperblog.app.ws.io.repositories.UserRepository;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.Utils;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 
-@Service
+@Service 
 public class UserServiceImpl implements UserService {
 	
 	@Autowired
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 		
 		//genero un userId random y compruebo que no exista ya para otro usuario y lo asigno al nuevo usuario
 		String generatedId = utils.generateUserId(30);
-		while(userRepository.findUserByUserId(generatedId) != null) {
+		while(userRepository.findUserByUserId(generatedId) != null) { //si no es null significa que alguien lo tiene ya, entonces creo otro
 			generatedId = utils.generateUserId(30);
 		}
 		userEntity.setUserId(generatedId);
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
 		
-		//Utilizo UserRepository para crear el user y lo asigno a otra entity para pasarla despues al dto y al response
+		//Utilizo UserRepository para crear el user(metodo del crudrepository) y lo asigno a otra entity para pasarla despues al dto y al response
 		UserEntity storedUsedDetails = userRepository.save(userEntity);
 		//copio lo guardado a un dto
 		UserDto returnValue = new UserDto();
@@ -54,10 +54,26 @@ public class UserServiceImpl implements UserService {
 		
 		return returnValue;
 	}
+	
+	@Override
+	public UserDto getUser(String email) {
+		//Busco el email ingresado para corroborar que el user existe
+		UserEntity userEntity = userRepository.findUserByEmail(email);
+		//si no existe el email, devuelvo exception
+		if(userEntity == null) throw new UsernameNotFoundException(email);
+		//copio el userEntity encontrado a un dto
+		UserDto returnValue = new UserDto();
+		BeanUtils.copyProperties(userEntity, returnValue);
+		
+		//devuelvo el dto
+		return returnValue;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		//Busco el email ingresado para corroborar que el user existe
 		UserEntity userEntity = userRepository.findUserByEmail(email);
+		//si no existe el email, devuelvo exception
 		if(userEntity == null) throw new UsernameNotFoundException(email);
 		
 		return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(), new ArrayList<>());
